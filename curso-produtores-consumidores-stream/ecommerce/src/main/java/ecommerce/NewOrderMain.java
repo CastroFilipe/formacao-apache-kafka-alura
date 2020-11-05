@@ -4,6 +4,7 @@ import java.sql.Date;
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 
+import org.apache.kafka.clients.producer.Callback;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -33,7 +34,8 @@ public class NewOrderMain {
 		 * 
 		 * para enviar a mensagem sem utilizar o callback: producer.send(record);
 		*/
-		producer.send(record, (dadosSucesso, exceptionDeFalha) -> {
+		
+		Callback callback = (dadosSucesso, exceptionDeFalha) -> {
 			if(exceptionDeFalha != null) {
 				System.out.println("Erro no envio..");
 				exceptionDeFalha.printStackTrace();
@@ -45,7 +47,14 @@ public class NewOrderMain {
 					+ " offset: " + dadosSucesso.offset() + " timestamp: " +dadosSucesso.timestamp() 
 					+ " date: "+ new Date(dadosSucesso.timestamp()));
 			}
-		}).get();
+		};
+		
+		producer.send(record, callback).get();
+		
+		/*Novo producer para o envio de um email confirmando o pedido. O producer enviará uma mensagem para o tópico ECOMMERCE_SEND_EMAIL*/
+		var emailRecord =  new ProducerRecord<String, String>("ECOMMERCE_SEND_EMAIL", "meuemaul@fakemail.com", "Seu pedido será processado, em breve você receberá a confirmação");
+	
+		producer.send(emailRecord, callback).get();
 	}
 
 	/*
@@ -59,8 +68,9 @@ public class NewOrderMain {
 		properties.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "127.0.0.1:9092");
 
 		/*
-		 * Propriedades necessário para serializar as Strings que serão utilizadas para o envio da mensagem. 
-		 * A utilização de Strings foi definido em new KafkaProducer<String, String>
+		 * Propriedades necessário para serializar as Strings que serão utilizadas para
+		 * o envio da mensagem. A utilização de Strings foi definido em new
+		 * KafkaProducer<String, String>
 		 */
 		properties.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
 		properties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
