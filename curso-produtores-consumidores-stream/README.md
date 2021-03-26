@@ -15,3 +15,6 @@
 
 5- Para listar os tópicos existentes: 
 > bin\windows\kafka-topics.bat --list --bootstrap-server localhost:9092
+
+6 - Para descrever os tópicos e suas propriedades:
+> bin\windows\kafka-topics.bat --bootstrap-server localhost:9092 --describe
