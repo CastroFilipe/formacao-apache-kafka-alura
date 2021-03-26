@@ -17,20 +17,26 @@ import org.apache.kafka.common.serialization.StringSerializer;
 public class NewOrderMain {
 
 	public static void main(String[] args) throws InterruptedException, ExecutionException {
+		/*
+		 * É o objeto responsável pelo envio da mensagem ao kafka. 
+		 * Os parâmetros de Tipagem representam o tipo da Chave e da Mensagem (nesse caso, ambos são do tipo String).
+		 * O parâmetro no construtor representa as propriedades de configuração do producer.
+		 * */
 		var producer = new KafkaProducer<String, String>(properties());
 		
-		//O valor da mensagem que será enviada(id do usuário, id do produto, valor)
-		var value = "243,93456,39.99";
+		//Uma mensagem repressentando um pedido de compra.
+		var value = "Teclado Gamer ReaDragon, 229.99";
+		var key = "1";
 		
-		/*Mensagem que será registrada(record). É necessário informar o tópico, a chave e o valor.
-		 * Como essa classse trata de novas ordens de pedido, foi criado no kafka o tópico "ECOMMERCE_NEW_ORDER"
+		/*Mensagem(record) que será enviada ao kafka. É necessário informar o tópico, a key e o value.
+		 * Como a mensagem trata de novas ordens de pedido, foi criado no kafka o tópico "ECOMMERCE_NEW_ORDER"
 		 * */
-		var record = new ProducerRecord<String, String>("ECOMMERCE_NEW_ORDER", value, value);
+		var record = new ProducerRecord<String, String>("ECOMMERCE_NEW_ORDER", key, value);
 
 		/*
-		 * Enviando o registro para o kafka. 
-		 * O método Send é assincrono, o .get() fará com que ele espere a conclusão do envio da mensagem e execute a função de callback.
-		 * Na função de calback iremos apenas informar o sucesso do envio da mensagem.
+		 * O método Send, que fará o envio da mensagem ao kafka, é assincrono, não aguardando o resultado da postagem (sucesso ou falha). 
+		 * O método get() permite aguardar o resultado do envio da mensagem, quando o resultado retornar será executada a função de callback.
+		 * Na função de calback iremos apenas informar o sucesso ou falha de envio da mensagem.
 		 * 
 		 * para enviar a mensagem sem utilizar o callback: producer.send(record);
 		*/
@@ -52,9 +58,9 @@ public class NewOrderMain {
 		producer.send(record, callback).get();
 		
 		/*Novo producer para o envio de um email confirmando o pedido. O producer enviará uma mensagem para o tópico ECOMMERCE_SEND_EMAIL*/
-		var emailRecord =  new ProducerRecord<String, String>("ECOMMERCE_SEND_EMAIL", "meuemaul@fakemail.com", "Seu pedido será processado, em breve você receberá a confirmação");
-	
-		producer.send(emailRecord, callback).get();
+//		var emailRecord =  new ProducerRecord<String, String>("ECOMMERCE_SEND_EMAIL", "meuemaul@fakemail.com", "Seu pedido será processado, em breve você receberá a confirmação");
+//	
+//		producer.send(emailRecord, callback).get();
 	}
 
 	/*
@@ -64,13 +70,13 @@ public class NewOrderMain {
 	private static Properties properties() {
 		var properties = new Properties();
 
-		// propriedade de conexão com o apache kafka
+		// propriedade de conexão com o apache kafka. Indica o servidor onde o kafka está sendo executado
 		properties.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "127.0.0.1:9092");
 
 		/*
-		 * Propriedades necessário para serializar as Strings que serão utilizadas para
-		 * o envio da mensagem. A utilização de Strings foi definido em new
-		 * KafkaProducer<String, String>
+		 * Propriedades que definem qual o Serializer utilizado no processo de serealização da chave(Key) e da Mensagem(value) que será enviada.
+		 * Será utilizado StringSerializer para key e value pois foram definidos tipo string no kafkaProducer.
+		 * 
 		 */
 		properties.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
 		properties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());

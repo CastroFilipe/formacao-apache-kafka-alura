@@ -5,10 +5,16 @@
   <version>0.0.1-SNAPSHOT</version>
   <description>Simulando o uso do kafka em um ecommerce</description>
   
+  	<properties>
+		<java.version>11</java.version>
+	</properties>
+  
   <dependencies>
-  	<!-- https://mvnrepository.com/artifact/org.apache.kafka/kafka 
-  		As classes disponíveis servirão para a conexão com o apache kafka e para a 
-  		utilização do sistema de mensageria(Criando produtores e consumidores em java).
+  	<!-- Link para o repositório central: https://mvnrepository.com/artifact/org.apache.kafka/kafka
+  	
+  		Fornece as classes básicas para a conexão com o apache kafka e para 
+  		a criação de consumers e producers em java.
+  		Já conta com a dependência do kafka-clients
   	-->
 	<dependency>
 	    <groupId>org.apache.kafka</groupId>
@@ -24,7 +30,19 @@
 	    <artifactId>slf4j-simple</artifactId>
 	    <version>1.7.30</version>
 	</dependency>
-	
-  	
   </dependencies>
+  
+  <build>
+    <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+                <source>11</source>
+                <target>11</target>
+            </configuration>
+        </plugin>
+    </plugins>
+</build>
+  
 </project>
