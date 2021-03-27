@@ -26,7 +26,7 @@ public class NewOrderMain {
 		
 		//Uma mensagem repressentando um pedido de compra.
 		var value = "Teclado Gamer ReaDragon, 229.99";
-		var key = "1";
+		var key = "vendas";
 		
 		/*Mensagem(record) que será enviada ao kafka. É necessário informar o tópico, a key e o value.
 		 * Como a mensagem trata de novas ordens de pedido, foi criado no kafka o tópico "ECOMMERCE_NEW_ORDER"
@@ -57,10 +57,11 @@ public class NewOrderMain {
 		
 		producer.send(record, callback).get();
 		
-		/*Novo producer para o envio de um email confirmando o pedido. O producer enviará uma mensagem para o tópico ECOMMERCE_SEND_EMAIL*/
-//		var emailRecord =  new ProducerRecord<String, String>("ECOMMERCE_SEND_EMAIL", "meuemaul@fakemail.com", "Seu pedido será processado, em breve você receberá a confirmação");
-//	
-//		producer.send(emailRecord, callback).get();
+		//Novo producer para o envio de um email confirmando o pedido. O producer enviará uma mensagem para o tópico ECOMMERCE_SEND_EMAIL
+		var emailRecord =  new ProducerRecord<String, String>(
+				"ECOMMERCE_SEND_EMAIL", "fake@fakemail.com", "Seu pedido será processado, em breve você receberá a confirmação");
+	
+		producer.send(emailRecord, callback).get();
 	}
 
 	/*

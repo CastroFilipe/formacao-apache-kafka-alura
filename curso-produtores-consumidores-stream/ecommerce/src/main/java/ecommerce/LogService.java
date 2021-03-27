@@ -19,23 +19,31 @@ public class LogService {
 		//Instanciando o consumer com as propriedades declarada.
 		var consumer = new KafkaConsumer<String, String>(properties());
 		
-		//Será um consumidor de qualquer tópico que comece com ECOMMERCE
+		/*
+		 * O Log consumirá qualquer mensagem postada postadas em tópicos que 
+		 * deem match com a expressão regular ECOMMERCE.*
+		 * */
 		consumer.subscribe(Pattern.compile("ECOMMERCE.*"));
 		
 		while (true) {
 			
-			//Faz a leitura e verifica se não existem novas mensagens.
+			//Faz a leitura e verifica se não existem novas mensagens a cada 100 milesegundos.
 			var records = consumer.poll(Duration.ofMillis(100));
 			
 			if (!records.isEmpty()) {
-				System.out.println("Mensagem recebida. Iniciando gravação do log...");
-				System.out.println("Log - " + records.count() + " registros");
+				System.out.println("\nMensagem(s) recebida. Iniciando gravação do log...\n");
+				System.out.println("Log - Quantidade de registros recebidos: " + records.count() + "\n");
+				
 				for (var record : records) {
-					System.out.println("Log Salvo..");
-					System.out.println(record.key());
-					System.out.println(record.value());
-					System.out.println(record.partition());
-					System.out.println(record.offset());
+					System.out.println("### Log Salvo");
+					
+					System.out.println("topic: " + record.topic());
+					System.out.println("Key: " + record.key());
+					System.out.println("value: "+ record.value());
+					System.out.println("partição: " + record.partition());
+					System.out.println("offset: " + record.offset());
+					System.out.println(record.headers().toString());
+					System.out.println("timestamp: " + record.timestamp());
 					System.out.println("------------------------------------------");
 				}
 			}

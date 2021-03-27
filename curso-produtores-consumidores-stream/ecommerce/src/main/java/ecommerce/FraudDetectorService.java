@@ -29,22 +29,26 @@ public class FraudDetectorService {
 			var records = consumer.poll(Duration.ofMillis(100));
 			
 			if (!records.isEmpty()) {
-				System.out.println("\n\n########## Encontrei " + records.count() + " registros ##########\n\n");
+				System.out.print("\n########## " + FraudDetectorService.class.getSimpleName());
+				System.out.println(": recebidos " + records.count() + " registros\n");
 				
 				for (var record : records) {
 					
-					System.out.println("Processing new order, checking for fraud");
+					System.out.println("Processing new order, checking for fraud...\n");
 					System.out.println("key: " + record.key());
 					System.out.println("value: " + record.value());
 					System.out.println("partition: " + record.partition());
 					System.out.println("offset: " + record.offset());
+					System.out.println(record.headers());
+					System.out.println("timestamp: " + record.timestamp());
+					
 					try {
 						Thread.sleep(5000);
 					} catch (InterruptedException e) {
 						// ignoring
 						e.printStackTrace();
 					}
-					System.out.println("Order processed");
+					System.out.println("\nOrder processed");
 					System.out.println("------------------------------------------");
 				}
 			}
